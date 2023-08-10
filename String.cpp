@@ -1,125 +1,279 @@
 #include "stdafx.h"
 #include "String.h"
 #include <cstring>
-#include <iostream>
-#include <cassert>
-#include <cstring>
-using namespace std;
+#include <algorithm>
 
-String::String()
+String::String(const char * str)
 {
-	str = nullptr;
+	if (str != nullptr)
+	{
+		int len = strlen(str) + 1;
+		data = new char[len];
+		strcpy_s(data, len, str);
+	}
+	else
+	{
+		data = nullptr;
+	}
 }
-
-String::String(const char* s)
-{
-	int len = strlen(s);
-	str = new char[len + 1];
-	strcpy_s(str, len+1, s);
-}
-
 
 String::~String()
 {
-	if (str) {
-		delete[]str;
+	if (data)
+	{
+		delete[] data;
+		data = nullptr;
 	}
 }
 
-void String::output() const
+String & String::operator+=(const String & other)
 {
-	if (str == nullptr) {
+	if (other.data == nullptr)
+	{
+		return *this;
+	}
+	if (data == nullptr)
+	{
+		int len = strlen(other.data) + 1;
+		data = new char[len];
+		strcpy_s(data, len, other.data);
+		return *this;
+	}
+	int len = strlen(data) + strlen(other.data) + 1;
+	char* tmp = new char[len];
+	strcpy_s(tmp, len, data);
+	strcat_s(tmp, len, other.data);
+	delete[] data;
+	data = tmp;
+	return *this;
+}
+
+String String::operator+(const String& other)
+{
+	String tmp;
+	if (data == nullptr && other.data == nullptr)
+	{
+		return tmp;
+	}
+
+	int len1 = (data != nullptr) ? strlen(data) : 0;
+	int len2 = (other.data != nullptr) ? strlen(other.data) : 0;
+	int len = len1 + len2 + 1;
+	char* temp = new char[len];
+	if (data != nullptr) {
+		strcpy_s(temp, len, data);
+	}
+	if (other.data != nullptr) {
+		strcat_s(temp, len, other.data);
+	}
+	tmp.data = temp;
+
+	return tmp;
+}
+
+String String::operator*(int times)
+{
+	String tmp;
+	for (int i = 0; i < times; ++i)
+	{
+		tmp += *this;
+	}
+	return tmp;
+}
+
+char String::operator[](int index)
+{
+	int len = strlen(data);
+	if (index >= len)
+	{
+		throw "invalid index";
+	}
+	return data[index];
+}
+
+const char String::operator[](int index) const
+{
+	int len = strlen(data);
+	if (index >= len)
+	{
+		throw "invalid index";
+	}
+	return data[index];
+}
+
+bool String::operator!=(const String & other)
+{
+	if (data == nullptr && other.data == nullptr)
+	{
+		return false;
+	}
+	else if (data == nullptr || other.data == nullptr)
+	{
+		return true;
+	}
+	else
+	{
+		return strcmp(data, other.data) != 0;
+	}
+}
+
+bool String::operator==(const String & other)
+{
+	if (data == nullptr && other.data == nullptr)
+	{
+		return true;
+	}
+	else if (data == nullptr || other.data == nullptr)
+	{
+		return false;
+	}
+	else
+	{
+		return strcmp(data, other.data) == 0;
+	}
+}
+
+char * String::c_str() const
+{
+	return data;
+}
+
+char String::at(int index) const
+{
+	int len = strlen(data);
+	if (index >= len)
+	{
+		throw "invalid index";
+	}
+	return data[index];
+}
+
+char String::front() const
+{
+	if (data == nullptr)
+	{
+		throw "there is not any data";
+	}
+	return data[0];
+}
+
+char String::back() const
+{
+	if (data == nullptr)
+	{
+		throw "there is not any data";
+	}
+	return data[strlen(data) - 1];
+}
+
+bool String::empty() const
+{
+	return data == nullptr;
+}
+
+int String::size() const
+{
+	if (data == nullptr)
+	{
+		return 0;
+	}
+	else
+	{
+		return strlen(data);
+	}
+}
+
+void String::erase(int index)
+{
+	if (data == nullptr)
+	{
+		cout << "empty object";
 		return;
 	}
-	cout << str << endl;
-}
 
-char * String::cat(int s)
-{
-	assert(str);
-	int len = strlen(str);
-	char* tmp = new char[len + 20];
-	strcpy_s(tmp, len + 1, str);
-	char s_c[20] = "";
-	sprintf_s(s_c, "%d", s);
-	int len_s = strlen(s_c);
-	strcat_s(tmp, len + len_s + 1, s_c);
-	if (str != nullptr) {
-		delete[]str;
+	int len = strlen(data);
+	if (index < 0 || index >= len)
+	{
+		throw "invalid index";
 	}
-	str = tmp;
-	return str;
-}
 
-char * String::cat(double s)
-{
-	assert(str);
-	int len = strlen(str);
-	char* tmp = new char[len + 20];
-	strcpy_s(tmp, len + 1, str);
-	char s_c[20] = "";
-	sprintf_s(s_c, "%lf", s);
-	int len_s = strlen(s_c);
-	strcat_s(tmp, len + len_s + 1, s_c);
-	if (str != nullptr) {
-		delete[]str;
-	}
-	str = tmp;
-	return str;
-}
-
-char * String::cat(const char * s)
-{
-	assert(str);
-	int len = strlen(str) + strlen(s) + 1;
-	strcat_s(str, len, s);
-	return str;
-}
-
-bool String::equal(const char * s) const
-{
-	return strcmp(str, s) == 0;
-}
-
-bool String::equal(const String & other) const
-{
-	return strcmp(this->str, other.str) == 0;
-}
-
-void String::assign(const char * s)
-{
-	if (s == nullptr) {
-		return;
-	}
-	int len = strlen(s) + 1;
 	char* tmp = new char[len];
-	strcpy_s(tmp, len, s);
-	if (str != nullptr) {
-		delete[]str;
+	for (int i = 0; i < index; ++i)
+	{
+		tmp[i] = data[i];
 	}
-	str = tmp;
+	for (int i = index; i < len - 1; ++i)
+	{
+		tmp[i] = data[i + 1];
+	}
+	tmp[len - 1] = '\0';
+
+	delete[] data;
+	data = tmp;
 }
 
-void String::assign(const String & other)
+void String::clear()
 {
-	assert(other.str);
-	int len = strlen(other.str) + 1;
+	if (data != nullptr)
+	{
+		delete[]data;
+		data = nullptr;
+	}
+}
+
+void String::pop_back()
+{
+	int len = strlen(data);
 	char* tmp = new char[len];
-	strcpy_s(tmp, len, other.str);
-	if (str != nullptr) {
-		delete[]str;
+	for (int i = 0; i < len - 1; ++i)
+	{
+		tmp[i] = data[i];
 	}
-	str = tmp;
+	tmp[len - 1] = '\0';
+	delete[]data;
+	data = tmp;
 }
 
-int String::compare(const char * s) const
+String String::substr(int index, int count) const
 {
-	assert(str && s);
-	return strcmp(str, s);
+	if (index < 0 || count < 0)
+	{
+		throw "invalid arguments";
+	}
+
+	int len = strlen(data);
+	if (index >= len)
+	{
+		throw "index out of range";
+	}
+	count = min(count, len - index);
+	String tmp;
+	tmp.data = new char[count];
+	for (int i = 0; i < count; ++i)
+	{
+		tmp.data[i] = data[index + i];
+	}
+	tmp.data[count] = '\0';
+
+	if (tmp.data == nullptr)
+	{
+		throw "memory allocation failed";
+	}
+
+	return tmp;
 }
 
-int String::compare(const String & other) const
+ostream & operator<<(ostream & out, const String & other)
 {
-	assert(str && other.str);
-	return strcmp(this->str, other.str);
+	if (other.data != nullptr)
+	{
+		out << other.data << endl;
+	}
+	return out;
+}
+
+istream & operator >> (istream & in, const String & other)
+{
+	in >> other.data;
+	return in;
 }
