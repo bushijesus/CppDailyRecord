@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="gb2312"?>
+<students>
+    <student>
+        <name>小明</name>
+        <sex>男</sex>
+        <age>20</age>
+    </student>
+    <student name="小明1" sex="男" age="22" />
+</students>

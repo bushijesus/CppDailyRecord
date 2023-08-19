@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="gb2312"?>
+<books>
+	<book id = "1001">
+		<name>open</name>
+		<author>tom</author>
+		<price>20</price>
+	</book>
+	<book id = "1002">
+		<name>Java</name>
+		<author>lili</author>
+		<price>21</price>
+	</book>
+	<book id = "1003">
+		<name>Java</name>
+		<author>lisa</author>
+		<price>24</price>
+	</book>
+</books>
